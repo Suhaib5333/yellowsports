@@ -1,0 +1,50 @@
+{
+  "nav": {
+    "home": "Home",
+    "about": "About",
+    "products": "Products",
+    "contact": "Contact"
+  },
+  "hero": {
+    "tagline": "Your Ultimate Sports Destination, Right Here in Bahrain",
+    "cta": "Explore Products",
+    "scroll": "Scroll to explore"
+  },
+  "about": {
+    "title": "The Sports Hub",
+    "subtitle": "About Us",
+    "description": "23 Yellow Sports is Bahrain's go-to destination for football jerseys, trophies, collectible pins, figurines, sports bags, footballs, flags, and everything a true sports fan needs. From Ronaldo and Messi jerseys to custom trophies and medals, we bring the passion of the game right to your doorstep.",
+    "cta": "Visit Our Store"
+  },
+  "productsCta": {
+    "title": "Explore Our Collection",
+    "subtitle": "Jerseys, trophies, collectibles, and everything for the true sports fan",
+    "cta": "View All Products"
+  },
+  "contact": {
+    "title": "Visit Our Store",
+    "subtitle": "Come see our collection in person",
+    "phone": "Call Us",
+    "whatsapp": "WhatsApp",
+    "email": "Email Us",
+    "instagram": "Follow Us",
+    "findUs": "Find Us",
+    "getDirections": "Get Directions"
+  },
+  "footer": {
+    "rights": "All rights reserved",
+    "tagline": "Your Ultimate Sports Destination"
+  },
+  "products": {
+    "title": "Our Products",
+    "back": "Back to Home",
+    "all": "All",
+    "jerseys": "Jerseys",
+    "trophies": "Trophies",
+    "collectibles": "Collectibles",
+    "footballs": "Footballs",
+    "accessories": "Accessories",
+    "visitCta": "Visit us in store to see the full collection",
+    "whatsappCta": "Order via WhatsApp"
+  }
+}

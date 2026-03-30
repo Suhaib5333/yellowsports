@@ -1,0 +1,175 @@
+@import "tailwindcss";
+
+@theme {
+  /* ── Brand Colors — Stadium Nightfall ── */
+  --color-primary: #FFE020;
+  --color-primary-dark: #D4B800;
+  --color-primary-light: #FFF176;
+  --color-primary-50: #FFFDE7;
+  --color-primary-100: #FFF9C4;
+  --color-primary-200: #FFF59D;
+  --color-primary-400: #FFEE58;
+  --color-primary-600: #FFE020;
+  --color-primary-800: #D4B800;
+  --color-primary-900: #050505;
+
+  /* Accent — White for contrast on dark */
+  --color-accent: #FFFFFF;
+  --color-accent-light: #F5F5F5;
+  --color-accent-dark: #E0E0E0;
+
+  /* Dark backgrounds */
+  --color-bg: #0A0A0A;
+  --color-bg-dark: #000000;
+  --color-bg-alt: #111111;
+  --color-bg-warm: #0F0D00;
+
+  /* Text — light on dark */
+  --color-text: #F5F5F0;
+  --color-text-light: #F5F5F0;
+  --color-text-muted: #9CA3AF;
+
+  /* Fonts */
+  --font-display: 'Bebas Neue', sans-serif;
+  --font-sans: 'DM Sans', sans-serif;
+  --font-arabic: 'Noto Sans Arabic', sans-serif;
+}
+
+/* ── Reset ────────────────────────────────────── */
+
+*,
+*::before,
+*::after {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+/* ── Base ─────────────────────────────────────── */
+
+html {
+  scroll-behavior: smooth;
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  font-family: var(--font-sans);
+  background-color: var(--color-bg);
+  color: var(--color-text);
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+  line-height: 1.7;
+  font-weight: 400;
+}
+
+[dir="rtl"] body {
+  font-family: var(--font-arabic);
+}
+
+/* Display font for headings — bold, condensed, sporty */
+h1, h2, h3 {
+  font-family: var(--font-display);
+  font-weight: 400;
+  letter-spacing: 0.04em;
+  line-height: 1.1;
+  text-transform: uppercase;
+}
+
+[dir="rtl"] h1,
+[dir="rtl"] h2,
+[dir="rtl"] h3 {
+  font-family: var(--font-arabic);
+  letter-spacing: 0;
+  text-transform: none;
+}
+
+/* ── Selection ────────────────────────────────── */
+
+::selection {
+  background-color: #FFE020;
+  color: #0A0A0A;
+}
+
+::-moz-selection {
+  background-color: #FFE020;
+  color: #0A0A0A;
+}
+
+/* ── Scrollbar ────────────────────────────────── */
+
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #FFE02040;
+  border-radius: 9999px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #FFE02070;
+}
+
+html {
+  scrollbar-width: thin;
+  scrollbar-color: #FFE02040 transparent;
+}
+
+/* ── Lenis Smooth Scroll ──────────────────────── */
+
+html.lenis,
+html.lenis body {
+  height: auto;
+}
+
+.lenis.lenis-smooth {
+  scroll-behavior: auto !important;
+}
+
+.lenis.lenis-smooth [data-lenis-prevent] {
+  overscroll-behavior: contain;
+}
+
+.lenis.lenis-stopped {
+  overflow: hidden;
+}
+
+/* ── Responsive Navbar Visibility ─────────────── */
+
+.nav-mobile {
+  display: flex !important;
+}
+
+.nav-desktop {
+  display: none !important;
+}
+
+@media (min-width: 1024px) {
+  .nav-mobile {
+    display: none !important;
+  }
+
+  .nav-desktop {
+    display: grid !important;
+  }
+}
+
+/* ── Reduced Motion ───────────────────────────── */
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}

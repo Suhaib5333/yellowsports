@@ -1,0 +1,21 @@
+{
+  "name": "Yellow Sports 23 — يلو سبورتس ٢٣",
+  "short_name": "Yellow Sports 23",
+  "description": "Bahrain's go-to sports store for football jerseys, trophies, medals, collectibles & more. Visit us in Isa Town.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#0A0A0A",
+  "theme_color": "#FFE020",
+  "orientation": "any",
+  "lang": "ar",
+  "dir": "rtl",
+  "categories": ["sports", "shopping"],
+  "icons": [
+    {
+      "src": "/logo.jpeg",
+      "sizes": "512x512",
+      "type": "image/jpeg",
+      "purpose": "any maskable"
+    }
+  ]
+}

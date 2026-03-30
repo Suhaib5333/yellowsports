@@ -262,6 +262,57 @@ export const wordRevealItem: Variants = {
 }
 
 // ─────────────────────────────────────────────
+// Scroll-Triggered Section Variants
+// ─────────────────────────────────────────────
+
+/** Scroll reveal with subtle 3D tilt — for section headings on mobile */
+export const scrollReveal3D: Variants = {
+  hidden: { opacity: 0, y: 40, rotateX: -8, filter: 'blur(6px)' },
+  visible: {
+    opacity: 1,
+    y: 0,
+    rotateX: 0,
+    filter: 'blur(0px)',
+    transition: { duration: 0.8, ease: [...easings.smooth] },
+  },
+}
+
+/** Scroll reveal from side — for alternating left/right content */
+export const scrollRevealLeft: Variants = {
+  hidden: { opacity: 0, x: -40, rotateY: 6, filter: 'blur(4px)' },
+  visible: {
+    opacity: 1,
+    x: 0,
+    rotateY: 0,
+    filter: 'blur(0px)',
+    transition: { duration: 0.7, ease: [...easings.smooth] },
+  },
+}
+
+export const scrollRevealRight: Variants = {
+  hidden: { opacity: 0, x: 40, rotateY: -6, filter: 'blur(4px)' },
+  visible: {
+    opacity: 1,
+    x: 0,
+    rotateY: 0,
+    filter: 'blur(0px)',
+    transition: { duration: 0.7, ease: [...easings.smooth] },
+  },
+}
+
+/** Scale up from distance — dramatic section entrance */
+export const scrollScaleUp: Variants = {
+  hidden: { opacity: 0, scale: 0.92, y: 30, filter: 'blur(8px)' },
+  visible: {
+    opacity: 1,
+    scale: 1,
+    y: 0,
+    filter: 'blur(0px)',
+    transition: { duration: 0.9, ease: [...easings.smooth] },
+  },
+}
+
+// ─────────────────────────────────────────────
 // Hover / Interaction Variants
 // ─────────────────────────────────────────────
 

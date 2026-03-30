@@ -52,6 +52,14 @@ html {
   -webkit-text-size-adjust: 100%;
 }
 
+/* Safe area for notched devices */
+@supports (padding: max(0px)) {
+  body {
+    padding-left: env(safe-area-inset-left);
+    padding-right: env(safe-area-inset-right);
+  }
+}
+
 body {
   font-family: var(--font-sans);
   background-color: var(--color-bg);
@@ -97,29 +105,17 @@ h1, h2, h3 {
   color: #0A0A0A;
 }
 
-/* ── Scrollbar ────────────────────────────────── */
+/* ── Scrollbar — hidden ──────────────────────── */
 
 ::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
-}
-
-::-webkit-scrollbar-track {
-  background: transparent;
-}
-
-::-webkit-scrollbar-thumb {
-  background: #FFE02040;
-  border-radius: 9999px;
-}
-
-::-webkit-scrollbar-thumb:hover {
-  background: #FFE02070;
+  display: none;
+  width: 0;
+  height: 0;
 }
 
 html {
-  scrollbar-width: thin;
-  scrollbar-color: #FFE02040 transparent;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
 }
 
 /* ── Lenis Smooth Scroll ──────────────────────── */
@@ -159,6 +155,14 @@ html.lenis body {
   .nav-desktop {
     display: grid !important;
   }
+}
+
+/* ── Hero Film Grain ─────────────────────────── */
+
+.hero-grain {
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+  background-repeat: repeat;
+  background-size: 180px 180px;
 }
 
 /* ── Reduced Motion ───────────────────────────── */

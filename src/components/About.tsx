@@ -3,16 +3,12 @@ import { motion, useInView } from 'framer-motion'
 import { gsap } from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import { useLanguage } from '../i18n/LanguageContext'
-import {
-  staggerContainerSlow,
-  fadeUpItem,
-  slowSpring,
-} from '../lib/animations'
 import storeInterior from '../assets/images/store-interior.jpeg'
+import storeDetail from '../assets/images/store-detail.jpeg'
 
 gsap.registerPlugin(ScrollTrigger)
 
-// Animated counter component
+// Animated counter — eased count-up triggered by inView
 function AnimatedCounter({
   value,
   suffix = '',
@@ -31,254 +27,465 @@ function AnimatedCounter({
     let frame: number
     const duration = 2000
     const start = performance.now()
-
     function animate(now: number) {
       const elapsed = now - start
       const progress = Math.min(elapsed / duration, 1)
       const eased = 1 - Math.pow(1 - progress, 3)
       setCount(Math.round(eased * value))
-      if (progress < 1) {
-        frame = requestAnimationFrame(animate)
-      }
+      if (progress < 1) frame = requestAnimationFrame(animate)
     }
-
     frame = requestAnimationFrame(animate)
     return () => cancelAnimationFrame(frame)
   }, [inView, value])
 
-  return (
-    <span>
-      {prefix}
-      {count}
-      {suffix}
-    </span>
-  )
+  return <>{prefix}{count}{suffix}</>
+}
+
+// Yellow stripe ornament — matching hero style
+const YellowOrnament = ({ isRTL }: { isRTL: boolean }) => (
+  <div style={{ display: 'flex', alignItems: 'center', width: '56px', flexDirection: isRTL ? 'row-reverse' : 'row' }}>
+    <div style={{ flex: 1, height: '1px', backgroundColor: '#FFE020' }} />
+    <div style={{
+      width: '4px', height: '4px',
+      backgroundColor: '#FFE020',
+      transform: 'rotate(45deg)',
+      flexShrink: 0,
+      margin: '0 6px',
+    }} />
+    <div style={{ flex: 1, height: '1px', backgroundColor: '#FFE020' }} />
+  </div>
+)
+
+// Accent frame styles for the overlapping image
+const accentFrameStyle: React.CSSProperties = {
+  overflow: 'hidden',
+  borderRadius: '2px',
+  border: '3px solid #0D0B06',
+  boxShadow: '0 24px 64px rgba(0,0,0,0.6)',
+  position: 'relative',
+}
+const accentInnerBorder: React.CSSProperties = {
+  position: 'absolute', inset: 0,
+  border: '1px solid rgba(255,224,32,0.2)',
+  pointerEvents: 'none',
+  zIndex: 1,
 }
 
 export default function About() {
   const { t, isRTL } = useLanguage()
   const sectionRef = useRef<HTMLElement>(null)
-  const imageContainerRef = useRef<HTMLDivElement>(null)
-  const imageRef = useRef<HTMLImageElement>(null)
-  const textRef = useRef<HTMLDivElement>(null)
+  const mainImageRef = useRef<HTMLImageElement>(null)
+  const accentImageRef = useRef<HTMLImageElement>(null)
+  const mobileAccentImageRef = useRef<HTMLImageElement>(null)
   const statsRef = useRef<HTMLDivElement>(null)
 
-  const textInView = useInView(textRef, { once: true, margin: '-100px' })
-  const statsInView = useInView(statsRef, { once: true, margin: '-50px' })
+  const mainImgContainerRef = useRef<HTMLDivElement>(null)
+  const mainImgInView = useInView(mainImgContainerRef, { once: true, margin: '0px' })
+  const statsInView = useInView(statsRef, { once: true, margin: '-80px' })
 
-  // GSAP ScrollTrigger — image zoom on scroll
+  // GSAP scroll-triggered zoom effects on images
   useEffect(() => {
-    const prefersReduced = window.matchMedia(
-      '(prefers-reduced-motion: reduce)'
-    ).matches
+    const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches
     if (prefersReduced) return
 
     const ctx = gsap.context(() => {
-      const image = imageRef.current
-      const container = imageContainerRef.current
-      if (!image || !container) return
+      if (mainImageRef.current) {
+        gsap.fromTo(mainImageRef.current,
+          { scale: 1.08 },
+          {
+            scale: 1, ease: 'none',
+            scrollTrigger: {
+              trigger: sectionRef.current,
+              start: 'top 85%', end: 'bottom 15%', scrub: 1.5,
+            },
+          }
+        )
+      }
+      if (accentImageRef.current) {
+        gsap.fromTo(accentImageRef.current,
+          { scale: 1.1, yPercent: -4 },
+          {
+            scale: 1, yPercent: 4, ease: 'none',
+            scrollTrigger: {
+              trigger: sectionRef.current,
+              start: 'top 85%', end: 'bottom 15%', scrub: 2,
+            },
+          }
+        )
+      }
+      if (mobileAccentImageRef.current) {
+        gsap.fromTo(mobileAccentImageRef.current,
+          { scale: 1.08 },
+          {
+            scale: 1, ease: 'none',
+            scrollTrigger: {
+              trigger: sectionRef.current,
+              start: 'top 85%', end: 'bottom 15%', scrub: 2,
+            },
+          }
+        )
+      }
 
-      gsap.fromTo(
-        image,
-        { scale: 1 },
-        {
-          scale: 1.06,
-          ease: 'none',
-          scrollTrigger: {
-            trigger: container,
-            start: 'top 80%',
-            end: 'bottom 20%',
-            scrub: 1.5,
-          },
-        }
-      )
+      // Subtle parallax on the text column — different speed than images
+      const textCol = sectionRef.current?.querySelector('.ys-about-text')
+      if (textCol) {
+        gsap.fromTo(textCol,
+          { yPercent: 4 },
+          {
+            yPercent: -4, ease: 'none',
+            scrollTrigger: {
+              trigger: sectionRef.current,
+              start: 'top 80%', end: 'bottom 20%', scrub: 1.8,
+            },
+          }
+        )
+      }
     }, sectionRef)
 
     return () => ctx.revert()
-  }, [isRTL])
+  }, [])
 
-  // Image slide-in variant (direction-aware)
-  const imageSlideVariant = {
-    hidden: { opacity: 0, x: isRTL ? 60 : -60 },
-    visible: {
-      opacity: 1,
-      x: 0,
-      transition: { duration: 0.8, ease: [0.22, 1, 0.36, 1] as const },
-    },
-  }
-
-  // Accent line variant
-  const accentLineVariant = {
-    hidden: { scaleX: 0 },
-    visible: {
-      scaleX: 1,
-      transition: {
-        ...slowSpring,
-        delay: 0.75,
-      },
-    },
-  }
-
-  // Stats data — sports store
   const stats = [
-    {
-      value: 2020,
-      prefix: '',
-      suffix: '',
-      label: isRTL ? 'تأسست' : 'Est.',
-    },
-    {
-      value: 500,
-      prefix: '',
-      suffix: '+',
-      label: isRTL ? 'منتج' : 'Products',
-    },
-    {
-      value: 50,
-      prefix: '',
-      suffix: '+',
-      label: isRTL ? 'قميص نادي' : 'Club Jerseys',
-    },
+    { value: 2020, prefix: '', suffix: '', label: isRTL ? 'تأسست' : 'Est.' },
+    { value: 500, prefix: '', suffix: '+', label: isRTL ? 'منتج' : 'Products' },
+    { value: 50, prefix: '', suffix: '+', label: isRTL ? 'قميص نادي' : 'Club Jerseys' },
   ] as const
+
+  const badgeLabel = isRTL ? 'تأسست ٢٠٢٠ · البحرين' : 'Est. 2020 · Bahrain'
 
   return (
     <section
       ref={sectionRef}
       id="about"
-      className="relative py-32 md:py-40 bg-bg"
+      style={{ backgroundColor: '#0D0B06', position: 'relative', overflow: 'hidden' }}
     >
-      <div className="max-w-7xl mx-auto px-6">
-        <div
-          className={`grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-0 items-start ${
-            isRTL ? 'direction-rtl' : ''
-          }`}
-        >
-          {/* === IMAGE COLUMN === */}
+      {/* Subtle radial glow — yellow tint from top */}
+      <div style={{
+        position: 'absolute', top: 0, left: '50%', transform: 'translateX(-50%)',
+        width: '800px', height: '500px',
+        background: 'radial-gradient(ellipse at top, rgba(255,224,32,0.03) 0%, transparent 70%)',
+        pointerEvents: 'none', zIndex: 0,
+      }} />
+
+      {/* Grain overlay */}
+      <div
+        className="hero-grain"
+        style={{
+          position: 'absolute', inset: 0, pointerEvents: 'none', zIndex: 0,
+          opacity: 0.03, mixBlendMode: 'overlay',
+        }}
+      />
+
+      <div className="ys-about-grid" style={{
+        position: 'relative', zIndex: 1,
+        maxWidth: '1280px',
+        margin: '0 auto',
+        padding: '96px 64px 128px',
+        display: 'grid',
+        gridTemplateColumns: '45% 1fr',
+        gap: '80px',
+        alignItems: 'center',
+      }}>
+
+        {/* ═══ IMAGE COLUMN ═══ */}
+        <div style={{ position: 'relative', order: isRTL ? 2 : 0 }}>
+
+          {/* Main portrait — clip-path reveal */}
           <motion.div
-            className={`lg:col-span-5 ${isRTL ? 'lg:order-2' : ''}`}
-            variants={imageSlideVariant}
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true, margin: '-100px' }}
+            ref={mainImgContainerRef}
+            style={{ overflow: 'hidden', borderRadius: '2px', position: 'relative', zIndex: 2 }}
+            animate={{ clipPath: mainImgInView ? 'inset(0% 0 0 0)' : 'inset(100% 0 0 0)' }}
+            transition={{ duration: 1.1, ease: [0.22, 1, 0.36, 1] }}
           >
-            <div
-              ref={imageContainerRef}
-              className="overflow-hidden rounded-lg"
-            >
-              <img
-                ref={imageRef}
-                src={storeInterior}
-                alt={isRTL ? '٢٣ يلو سبورتس' : '23 Yellow Sports'}
-                className="w-full aspect-[3/4] object-cover will-change-transform"
-              />
-            </div>
-            {/* Caption */}
-            <p
-              className={`mt-4 text-sm text-text-muted ${
-                isRTL ? 'text-right' : 'text-left'
-              }`}
-            >
-              Est. 2020 — Bahrain
-            </p>
+            <img
+              ref={mainImageRef}
+              src={storeInterior}
+              alt={isRTL ? 'يلو سبورتس ٢٣' : 'Yellow Sports 23'}
+              style={{
+                width: '100%',
+                aspectRatio: '3 / 4',
+                objectFit: 'cover',
+                display: 'block',
+                willChange: 'transform',
+              }}
+            />
+            {/* Bottom gradient fade on image */}
+            <div style={{
+              position: 'absolute', bottom: 0, left: 0, right: 0,
+              height: '40%',
+              background: 'linear-gradient(to top, rgba(10,10,10,0.6) 0%, transparent 100%)',
+            }} />
           </motion.div>
 
-          {/* === TEXT COLUMN === */}
-          <div
-            className={`lg:col-span-6 ${
-              isRTL ? 'lg:order-1 lg:col-start-1' : 'lg:col-start-7'
-            }`}
-            ref={textRef}
+          {/* Desktop accent image — offset overlapping into the gap */}
+          <motion.div
+            className="ys-about-accent-desktop"
+            style={{
+              ...accentFrameStyle,
+              position: 'absolute',
+              bottom: '-48px',
+              ...(isRTL ? { left: '-36px' } : { right: '-36px' }),
+              width: '52%',
+              zIndex: 3,
+            }}
+            initial={{ opacity: 0, y: 40 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.9, delay: 0.4, ease: [0.22, 1, 0.36, 1] }}
+            viewport={{ once: true, margin: '0px' }}
           >
-            <motion.div
-              variants={staggerContainerSlow}
-              initial="hidden"
-              animate={textInView ? 'visible' : 'hidden'}
-              className={`flex flex-col ${
-                isRTL ? 'items-end text-right' : 'items-start text-left'
-              }`}
-            >
-              {/* Subtitle label with yellow accent line */}
-              <motion.div
-                variants={fadeUpItem}
-                className={`flex items-center gap-3 mb-6 ${
-                  isRTL ? 'flex-row-reverse' : 'flex-row'
-                }`}
+            <img
+              ref={accentImageRef}
+              src={storeDetail}
+              alt=""
+              aria-hidden
+              style={{ width: '100%', aspectRatio: '1 / 1', objectFit: 'cover', display: 'block', willChange: 'transform' }}
+            />
+            <div style={accentInnerBorder} />
+          </motion.div>
+
+          {/* Mobile accent image — relative, overlaps from below */}
+          <motion.div
+            className="ys-about-accent-mobile"
+            style={{
+              ...accentFrameStyle,
+              display: 'none',
+              width: '62%',
+              marginTop: '-80px',
+              marginInlineStart: 'auto',
+              position: 'relative',
+              zIndex: 3,
+            }}
+            initial={{ opacity: 0, y: 24 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, delay: 0.3, ease: [0.22, 1, 0.36, 1] }}
+            viewport={{ once: true, margin: '0px' }}
+          >
+            <img
+              ref={mobileAccentImageRef}
+              src={storeDetail}
+              alt=""
+              aria-hidden
+              style={{ width: '100%', aspectRatio: '1 / 1', objectFit: 'cover', display: 'block', willChange: 'transform' }}
+            />
+            <div style={accentInnerBorder} />
+          </motion.div>
+
+          {/* Yellow vertical accent line */}
+          <motion.div
+            className="ys-about-accent-line"
+            style={{
+              position: 'absolute',
+              top: '15%', bottom: '20%',
+              ...(isRTL ? { right: '-24px' } : { left: '-24px' }),
+              width: '1px',
+              backgroundColor: '#FFE020',
+              transformOrigin: 'top',
+              opacity: 0.35,
+            }}
+            initial={{ scaleY: 0 }}
+            whileInView={{ scaleY: 1 }}
+            transition={{ duration: 1.2, delay: 0.3, ease: [0.22, 1, 0.36, 1] }}
+            viewport={{ once: true }}
+          />
+
+          {/* Caption badge — floating over the main image */}
+          <motion.div
+            style={{
+              position: 'absolute',
+              top: '20px',
+              ...(isRTL ? { left: '16px' } : { right: '16px' }),
+              zIndex: 4,
+              padding: '6px 14px',
+              backgroundColor: 'rgba(10,10,10,0.82)',
+              border: '1px solid rgba(255,224,32,0.35)',
+              backdropFilter: 'blur(8px)',
+              WebkitBackdropFilter: 'blur(8px)',
+            }}
+            initial={{ opacity: 0, y: -12 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.7, delay: 0.6, ease: [0.22, 1, 0.36, 1] }}
+            viewport={{ once: true }}
+          >
+            <span style={{
+              fontFamily: isRTL ? 'var(--font-arabic)' : 'var(--font-sans)',
+              fontSize: '9px',
+              letterSpacing: isRTL ? '0.04em' : '0.28em',
+              color: '#FFE020',
+              textTransform: isRTL ? 'none' : 'uppercase',
+              fontWeight: 600,
+              direction: isRTL ? 'rtl' : 'ltr',
+            }}>
+              {badgeLabel}
+            </span>
+          </motion.div>
+        </div>
+
+        {/* ═══ TEXT COLUMN ═══ */}
+        <div
+          className="ys-about-text"
+          dir={isRTL ? 'rtl' : 'ltr'}
+          style={{
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'flex-start',
+            textAlign: isRTL ? 'right' : 'left',
+            paddingBottom: '48px',
+            order: isRTL ? 1 : 0,
+          }}
+        >
+
+          {/* Label + ornament */}
+          <motion.div
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '12px',
+              marginBottom: '28px',
+              flexDirection: isRTL ? 'row-reverse' : 'row',
+            }}
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
+            viewport={{ once: true, margin: '0px' }}
+          >
+            <YellowOrnament isRTL={isRTL} />
+            <span style={{
+              fontFamily: isRTL ? 'var(--font-arabic)' : 'var(--font-sans)',
+              fontSize: '10px',
+              letterSpacing: isRTL ? '0.04em' : '0.32em',
+              color: '#FFE020',
+              textTransform: isRTL ? 'none' : 'uppercase',
+              fontWeight: 700,
+              textShadow: '0 0 12px rgba(255,224,32,0.3)',
+            }}>
+              {t.about.subtitle}
+            </span>
+          </motion.div>
+
+          {/* Title — 3D perspective reveal */}
+          <motion.h2
+            style={{
+              fontFamily: isRTL ? 'var(--font-arabic)' : 'var(--font-display)',
+              fontWeight: isRTL ? 700 : 400,
+              fontSize: 'clamp(2.8rem, 5vw, 5.5rem)',
+              lineHeight: isRTL ? 1.3 : 1.05,
+              color: '#FFFFFF',
+              marginBottom: '32px',
+              letterSpacing: isRTL ? '0.01em' : '0.03em',
+              textShadow: '0 2px 16px rgba(0,0,0,0.4)',
+              perspective: '800px',
+            }}
+            initial={{ opacity: 0, y: 40, rotateX: -8, filter: 'blur(6px)' }}
+            whileInView={{ opacity: 1, y: 0, rotateX: 0, filter: 'blur(0px)' }}
+            transition={{ duration: 0.8, delay: 0.1, ease: [0.22, 1, 0.36, 1] }}
+            viewport={{ once: true, margin: '-60px' }}
+          >
+            {t.about.title}
+          </motion.h2>
+
+          {/* Description */}
+          <motion.p
+            style={{
+              fontFamily: isRTL ? 'var(--font-arabic)' : 'var(--font-sans)',
+              fontSize: 'clamp(0.95rem, 1.1vw, 1.1rem)',
+              lineHeight: isRTL ? 2 : 1.85,
+              color: 'rgba(245,245,240,0.6)',
+              maxWidth: '480px',
+              marginBottom: '48px',
+              direction: isRTL ? 'rtl' : 'ltr',
+            }}
+            initial={{ opacity: 0, y: 24 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, delay: 0.2, ease: [0.22, 1, 0.36, 1] }}
+            viewport={{ once: true, margin: '0px' }}
+          >
+            {t.about.description}
+          </motion.p>
+
+          {/* Yellow ornament divider */}
+          <motion.div
+            style={{ marginBottom: '40px' }}
+            initial={{ opacity: 0 }}
+            whileInView={{ opacity: 1 }}
+            transition={{ duration: 0.6, delay: 0.3 }}
+            viewport={{ once: true }}
+          >
+            <YellowOrnament isRTL={isRTL} />
+          </motion.div>
+
+          {/* Stats */}
+          <motion.div
+            ref={statsRef}
+            style={{ display: 'flex', flexDirection: 'row', width: '100%' }}
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.7, delay: 0.35, ease: [0.22, 1, 0.36, 1] }}
+            viewport={{ once: true, margin: '0px' }}
+          >
+            {stats.map((stat, i) => (
+              <div
+                key={i}
+                style={{
+                  flex: 1,
+                  display: 'flex',
+                  flexDirection: 'column',
+                  alignItems: 'flex-start',
+                  paddingInlineStart: i > 0 ? 'clamp(12px, 4vw, 24px)' : '0',
+                  paddingInlineEnd: i < stats.length - 1 ? 'clamp(12px, 4vw, 24px)' : '0',
+                  borderInlineEnd: i < stats.length - 1 ? '1px solid rgba(255,224,32,0.15)' : 'none',
+                }}
               >
-                <motion.span
-                  variants={accentLineVariant}
-                  className="inline-block w-6 h-px bg-primary"
-                  style={{
-                    transformOrigin: isRTL ? 'right' : 'left',
-                  }}
-                />
-                <span
-                  className={`text-xs font-sans font-medium uppercase text-primary ${
-                    isRTL ? 'tracking-normal font-arabic' : 'tracking-[0.2em]'
-                  }`}
-                >
-                  {t.about.subtitle}
+                <span style={{
+                  fontFamily: isRTL ? 'var(--font-arabic)' : 'var(--font-display)',
+                  fontSize: 'clamp(1.8rem, 3vw, 2.8rem)',
+                  fontWeight: isRTL ? 700 : 400,
+                  color: '#FFE020',
+                  lineHeight: 1,
+                  marginBottom: '6px',
+                  fontVariantNumeric: 'tabular-nums',
+                  textShadow: '0 0 20px rgba(255,224,32,0.2)',
+                }}>
+                  <AnimatedCounter value={stat.value} suffix={stat.suffix} prefix={stat.prefix} inView={statsInView} />
                 </span>
-              </motion.div>
-
-              {/* Title */}
-              <motion.h2
-                variants={fadeUpItem}
-                className={`text-4xl md:text-5xl lg:text-6xl text-text leading-[1.1] mb-8 ${
-                  isRTL ? 'font-arabic font-bold' : 'font-display'
-                }`}
-              >
-                {t.about.title}
-              </motion.h2>
-
-              {/* Description */}
-              <motion.p
-                variants={fadeUpItem}
-                className="text-base md:text-lg text-text-muted leading-relaxed max-w-lg mb-12"
-              >
-                {t.about.description}
-              </motion.p>
-
-              {/* Stats row */}
-              <motion.div
-                ref={statsRef}
-                variants={fadeUpItem}
-                className={`flex ${
-                  isRTL ? 'flex-row-reverse' : 'flex-row'
-                }`}
-              >
-                {stats.map((stat, i) => (
-                  <div
-                    key={i}
-                    className={`flex flex-col px-6 first:ps-0 last:pe-0 ${
-                      isRTL ? 'items-end' : 'items-start'
-                    } ${
-                      i < stats.length - 1
-                        ? isRTL
-                          ? 'border-l border-text-muted/20'
-                          : 'border-r border-text-muted/20'
-                        : ''
-                    }`}
-                  >
-                    <span className={`text-3xl tabular-nums text-primary ${
-                      isRTL ? 'font-arabic' : 'font-display'
-                    }`}>
-                      <AnimatedCounter
-                        value={stat.value}
-                        suffix={stat.suffix}
-                        prefix={stat.prefix}
-                        inView={statsInView}
-                      />
-                    </span>
-                    <span className="text-xs text-text-muted uppercase mt-1 font-medium tracking-wide">
-                      {stat.label}
-                    </span>
-                  </div>
-                ))}
-              </motion.div>
-            </motion.div>
-          </div>
+                <span style={{
+                  fontFamily: isRTL ? 'var(--font-arabic)' : 'var(--font-sans)',
+                  fontSize: '10px',
+                  letterSpacing: isRTL ? '0.03em' : '0.2em',
+                  color: 'rgba(245,245,240,0.35)',
+                  textTransform: isRTL ? 'none' : 'uppercase',
+                  fontWeight: 500,
+                }}>
+                  {stat.label}
+                </span>
+              </div>
+            ))}
+          </motion.div>
         </div>
       </div>
+
+      <style>{`
+        .ys-about-accent-desktop { display: block; }
+        .ys-about-accent-mobile  { display: none !important; }
+
+        @media (min-width: 769px) and (max-width: 1024px) {
+          .ys-about-grid {
+            grid-template-columns: 1fr 1fr !important;
+            gap: 48px !important;
+            padding: 80px 40px 100px !important;
+          }
+        }
+
+        @media (max-width: 768px) {
+          .ys-about-grid {
+            grid-template-columns: 1fr !important;
+            gap: 56px !important;
+            padding: 64px 24px 72px !important;
+          }
+          .ys-about-accent-desktop { display: none !important; }
+          .ys-about-accent-mobile  { display: block !important; }
+          .ys-about-accent-line { display: none !important; }
+        }
+      `}</style>
     </section>
   )
 }

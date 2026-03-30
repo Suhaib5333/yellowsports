@@ -1,0 +1,8 @@
+User-agent: *
+Allow: /
+Disallow: /assets/
+
+Sitemap: https://yellowsports23.com/sitemap.xml
+
+# Yellow Sports 23 — Bahrain Sports Store
+# https://yellowsports23.com

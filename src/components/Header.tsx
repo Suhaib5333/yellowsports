@@ -1,7 +1,8 @@
 import { useState, useEffect, useCallback } from 'react'
-import { motion, useScroll, useMotionValueEvent, AnimatePresence } from 'framer-motion'
+import { motion, useScroll, useMotionValueEvent, useSpring, AnimatePresence } from 'framer-motion'
 import { useNavigate, useLocation } from 'react-router-dom'
 import { useLanguage } from '../i18n/LanguageContext'
+import { smoothScrollTo } from '../hooks/useSmoothScroll'
 import LanguageToggle from './LanguageToggle'
 import logo from '../assets/logos/logo.jpeg'
 
@@ -14,13 +15,18 @@ export default function Header() {
   const [menuOpen, setMenuOpen] = useState(false)
   const [scrolled, setScrolled] = useState(false)
   const [activeSection, setActiveSection] = useState<string>('hero')
-  const { scrollY } = useScroll()
+  const { scrollY, scrollYProgress } = useScroll()
+
+  const smoothProgress = useSpring(scrollYProgress, { stiffness: 100, damping: 30, restDelta: 0.001 })
+  const isHome = location.pathname === '/'
 
   useMotionValueEvent(scrollY, 'change', (latest) => {
     setScrolled(latest > 80)
   })
 
+  // Observe sections on home page
   useEffect(() => {
+    if (!isHome) return
     const observers: IntersectionObserver[] = []
     NAV_SECTION_IDS.forEach((id) => {
       const el = document.getElementById(id)
@@ -33,33 +39,85 @@ export default function Header() {
       observers.push(observer)
     })
     return () => observers.forEach((o) => o.disconnect())
-  }, [])
+  }, [isHome])
 
+  // Close menu on resize
   useEffect(() => {
     const handleResize = () => setMenuOpen(false)
     window.addEventListener('resize', handleResize)
     return () => window.removeEventListener('resize', handleResize)
   }, [])
 
+  // Lock body scroll when menu open
   useEffect(() => {
     document.body.style.overflow = menuOpen ? 'hidden' : ''
     return () => { document.body.style.overflow = '' }
   }, [menuOpen])
 
+  // Close menu on Escape key
+  useEffect(() => {
+    if (!menuOpen) return
+    const handleKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') setMenuOpen(false)
+    }
+    window.addEventListener('keydown', handleKey)
+    return () => window.removeEventListener('keydown', handleKey)
+  }, [menuOpen])
+
+  // Close menu on route change
+  useEffect(() => {
+    setMenuOpen(false)
+  }, [location.pathname])
+
   const scrollToSection = useCallback(
     (id: string) => {
       setMenuOpen(false)
-      if (location.pathname !== '/') {
+      setActiveSection(id)
+
+      const doScroll = () => {
+        const el = document.getElementById(id)
+        if (el) {
+          smoothScrollTo(el)
+          return true
+        }
+        return false
+      }
+
+      if (!isHome) {
         navigate('/')
-        setTimeout(() => {
-          document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' })
-        }, 100)
+        // Retry until section mounts
+        let attempts = 0
+        const tryScroll = () => {
+          if (doScroll() || attempts >= 15) return
+          attempts++
+          setTimeout(tryScroll, 80)
+        }
+        setTimeout(tryScroll, 100)
       } else {
-        document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' })
+        doScroll()
       }
     },
-    [location.pathname, navigate]
+    [isHome, navigate]
   )
+
+  const handleLogoClick = useCallback((e: React.MouseEvent) => {
+    e.preventDefault()
+    setActiveSection('hero')
+    if (isHome) {
+      const lenis = window.__lenis
+      if (lenis) {
+        lenis.stop()
+        requestAnimationFrame(() => {
+          lenis.start()
+          lenis.scrollTo(0, { duration: 1.2 })
+        })
+      } else {
+        window.scrollTo({ top: 0, behavior: 'smooth' })
+      }
+    } else {
+      navigate('/')
+    }
+  }, [isHome, navigate])
 
   const navItems = [
     { label: t.nav.home, id: 'hero' },
@@ -68,7 +126,15 @@ export default function Header() {
     { label: t.nav.contact, id: 'contact' },
   ] as const
 
-  // Mobile state colors
+  // Determine active nav item
+  const getIsActive = (id: string) => {
+    // If user just clicked a nav item, activeSection is already set
+    if (activeSection === id) return true
+    // Fallback: highlight "Products" when on /products page and nothing was clicked
+    if (!isHome && id === 'products-cta' && activeSection === 'hero') return true
+    return false
+  }
+
   const mobileBg = menuOpen
     ? 'rgba(10, 10, 10, 0.98)'
     : scrolled
@@ -76,7 +142,6 @@ export default function Header() {
     : 'rgba(0, 0, 0, 0.35)'
   const mobileBlur = scrolled || menuOpen ? 'blur(12px)' : 'none'
   const mobileBorder = scrolled || menuOpen ? '1px solid rgba(255,224,32,0.08)' : '1px solid transparent'
-  const mobileLineColor = '#FFFFFF'
 
   return (
     <>
@@ -105,18 +170,18 @@ export default function Header() {
             backdropFilter: mobileBlur,
             WebkitBackdropFilter: mobileBlur,
             borderBottom: mobileBorder,
-            transition: 'background-color 0.4s ease-out, height 0.4s ease-out',
+            transition: 'background-color 0.4s ease-out, height 0.4s ease-out, border-color 0.4s ease-out',
           }}
         >
           {/* Logo */}
           <a
-            href="#hero"
-            onClick={(e) => { e.preventDefault(); scrollToSection('hero') }}
+            href="/"
+            onClick={handleLogoClick}
             style={{ display: 'flex', alignItems: 'center', gap: '10px', textDecoration: 'none', flex: '1', minWidth: 0, overflow: 'hidden' }}
           >
             <img
               src={logo}
-              alt="23 Yellow Sports"
+              alt="Yellow Sports 23"
               style={{ width: '38px', height: '38px', borderRadius: '6px', objectFit: 'cover', flexShrink: 0 }}
             />
             <span
@@ -131,14 +196,15 @@ export default function Header() {
                 textOverflow: 'ellipsis',
               }}
             >
-              23 YELLOW SPORTS
+              YELLOW SPORTS 23
             </span>
           </a>
 
-          {/* Hamburger — 3 lines */}
+          {/* Hamburger */}
           <button
             onClick={() => setMenuOpen(!menuOpen)}
-            aria-label="Toggle menu"
+            aria-label={menuOpen ? 'Close menu' : 'Open menu'}
+            aria-expanded={menuOpen}
             style={{
               display: 'flex',
               flexDirection: 'column',
@@ -156,19 +222,19 @@ export default function Header() {
           >
             <span style={{
               display: 'block', width: '22px', height: '2px',
-              backgroundColor: menuOpen ? '#FFE020' : mobileLineColor,
+              backgroundColor: menuOpen ? '#FFE020' : '#FFFFFF',
               borderRadius: '1px', transition: 'all 0.3s ease-out',
               transform: menuOpen ? 'translateY(7px) rotate(45deg)' : 'none',
             }} />
             <span style={{
               display: 'block', width: '22px', height: '2px',
-              backgroundColor: menuOpen ? '#FFE020' : mobileLineColor,
+              backgroundColor: menuOpen ? '#FFE020' : '#FFFFFF',
               borderRadius: '1px', transition: 'all 0.3s ease-out',
               opacity: menuOpen ? 0 : 1,
             }} />
             <span style={{
               display: 'block', width: '22px', height: '2px',
-              backgroundColor: menuOpen ? '#FFE020' : mobileLineColor,
+              backgroundColor: menuOpen ? '#FFE020' : '#FFFFFF',
               borderRadius: '1px', transition: 'all 0.3s ease-out',
               transform: menuOpen ? 'translateY(-7px) rotate(-45deg)' : 'none',
             }} />
@@ -189,19 +255,19 @@ export default function Header() {
             backdropFilter: scrolled ? 'blur(12px)' : 'none',
             WebkitBackdropFilter: scrolled ? 'blur(12px)' : 'none',
             borderBottom: scrolled ? '1px solid rgba(255,224,32,0.06)' : '1px solid transparent',
-            transition: 'height 0.5s ease-out, background-color 0.5s ease-out',
+            transition: 'height 0.5s ease-out, background-color 0.5s ease-out, border-color 0.5s ease-out',
           }}
         >
           {/* LEFT — Logo */}
           <div style={{ display: 'flex', alignItems: 'center' }}>
             <a
-              href="#hero"
-              onClick={(e) => { e.preventDefault(); scrollToSection('hero') }}
+              href="/"
+              onClick={handleLogoClick}
               style={{ display: 'flex', alignItems: 'center', gap: '14px', textDecoration: 'none' }}
             >
               <img
                 src={logo}
-                alt="23 Yellow Sports"
+                alt="Yellow Sports 23"
                 style={{
                   width: '48px', height: '48px',
                   borderRadius: '8px', objectFit: 'cover',
@@ -221,7 +287,7 @@ export default function Header() {
                     transition: 'color 0.5s ease-out',
                   }}
                 >
-                  23 YELLOW SPORTS
+                  YELLOW SPORTS 23
                 </span>
                 <span
                   style={{
@@ -240,73 +306,91 @@ export default function Header() {
           </div>
 
           {/* CENTER — Nav Links */}
-          <ul style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', listStyle: 'none', margin: 0, padding: 0 }}>
-            {navItems.map((item) => {
-              const isActive = activeSection === item.id
-              return (
-                <li key={item.id}>
-                  <button
-                    onClick={() => scrollToSection(item.id)}
-                    style={{
-                      position: 'relative',
-                      background: 'none',
-                      border: 'none',
-                      cursor: 'pointer',
-                      fontFamily: isRTL ? 'var(--font-arabic)' : 'var(--font-sans)',
-                      fontWeight: 600,
-                      textTransform: isRTL ? 'none' : 'uppercase',
-                      fontSize: '14px',
-                      letterSpacing: isRTL ? '0' : '0.14em',
-                      padding: '10px 22px',
-                      color: isActive
-                        ? '#FFE020'
-                        : scrolled ? 'rgba(245,245,240,0.45)' : 'rgba(255,255,255,0.5)',
-                      transition: 'color 0.3s ease',
-                    }}
-                    onMouseEnter={(e) => {
-                      if (!isActive) e.currentTarget.style.color = '#FFFFFF'
-                    }}
-                    onMouseLeave={(e) => {
-                      if (!isActive) {
-                        e.currentTarget.style.color = scrolled ? 'rgba(245,245,240,0.45)' : 'rgba(255,255,255,0.5)'
-                      }
-                    }}
-                  >
-                    {item.label}
-                    {/* Active underline */}
-                    <span
+          <nav>
+            <ul style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', listStyle: 'none', margin: 0, padding: 0 }}>
+              {navItems.map((item) => {
+                const isActive = getIsActive(item.id)
+                const inactiveColor = scrolled ? 'rgba(245,245,240,0.45)' : 'rgba(255,255,255,0.5)'
+                return (
+                  <li key={item.id}>
+                    <button
+                      onClick={() => scrollToSection(item.id)}
                       style={{
-                        position: 'absolute',
-                        bottom: '4px',
-                        left: '22px',
-                        right: '22px',
-                        height: '2px',
-                        backgroundColor: '#FFE020',
-                        borderRadius: '1px',
-                        transform: isActive ? 'scaleX(1)' : 'scaleX(0)',
-                        transformOrigin: 'center',
-                        transition: 'transform 0.3s ease',
+                        position: 'relative',
+                        background: 'none',
+                        border: 'none',
+                        cursor: 'pointer',
+                        fontFamily: isRTL ? 'var(--font-arabic)' : 'var(--font-sans)',
+                        fontWeight: 600,
+                        textTransform: isRTL ? 'none' : 'uppercase',
+                        fontSize: '14px',
+                        letterSpacing: isRTL ? '0' : '0.14em',
+                        padding: '10px 22px',
+                        color: isActive ? '#FFE020' : inactiveColor,
+                        transition: 'color 0.3s ease',
                       }}
-                    />
-                  </button>
-                </li>
-              )
-            })}
-          </ul>
+                      onMouseEnter={(e) => {
+                        if (!isActive) e.currentTarget.style.color = '#FFFFFF'
+                      }}
+                      onMouseLeave={(e) => {
+                        if (!isActive) e.currentTarget.style.color = inactiveColor
+                      }}
+                    >
+                      {item.label}
+                      <span
+                        style={{
+                          position: 'absolute',
+                          bottom: '4px',
+                          left: '22px',
+                          right: '22px',
+                          height: '2px',
+                          backgroundColor: '#FFE020',
+                          borderRadius: '1px',
+                          transform: isActive ? 'scaleX(1)' : 'scaleX(0)',
+                          transformOrigin: 'center',
+                          transition: 'transform 0.3s ease',
+                        }}
+                      />
+                    </button>
+                  </li>
+                )
+              })}
+            </ul>
+          </nav>
 
           {/* RIGHT — Language Toggle */}
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end' }}>
             <LanguageToggle variant={scrolled ? 'dark' : 'light'} />
           </div>
         </div>
+
+        {/* ====== SCROLL PROGRESS BAR ====== */}
+        <motion.div
+          style={{
+            position: 'absolute',
+            bottom: 0,
+            left: 0,
+            right: 0,
+            height: '2px',
+            background: '#FFE020',
+            transformOrigin: isRTL ? 'right' : 'left',
+            scaleX: smoothProgress,
+            opacity: scrolled ? 1 : 0,
+            zIndex: 60,
+            boxShadow: '0 0 8px rgba(255,224,32,0.4)',
+          }}
+          transition={{ opacity: { duration: 0.3 } }}
+        />
       </header>
 
       {/* ====== MOBILE MENU OVERLAY ====== */}
       <AnimatePresence>
         {menuOpen && (
           <motion.div
-            className="fixed inset-0 z-40 flex flex-col"
+            className="fixed inset-0 z-40"
             style={{
+              display: 'flex',
+              flexDirection: 'column',
               backgroundColor: 'rgba(0, 0, 0, 0.85)',
               backdropFilter: 'blur(24px)',
               WebkitBackdropFilter: 'blur(24px)',
@@ -316,7 +400,7 @@ export default function Header() {
             exit={{ opacity: 0 }}
             transition={{ duration: 0.3, ease: 'easeOut' }}
           >
-            {/* Subtle yellow radial glow at top */}
+            {/* Yellow radial glow */}
             <div style={{
               position: 'absolute', top: 0, left: '50%', transform: 'translateX(-50%)',
               width: '500px', height: '300px',
@@ -324,10 +408,9 @@ export default function Header() {
               pointerEvents: 'none',
             }} />
 
-            <div className="flex flex-col items-center justify-center flex-1">
+            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', flex: 1 }}>
               <motion.ul
-                className="flex flex-col items-center"
-                style={{ gap: '8px' }}
+                style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '8px', listStyle: 'none', margin: 0, padding: 0 }}
                 initial="hidden"
                 animate="visible"
                 exit="hidden"
@@ -339,11 +422,10 @@ export default function Header() {
                 }}
               >
                 {navItems.map((item) => {
-                  const isActive = activeSection === item.id
+                  const isActive = getIsActive(item.id)
                   return (
                     <motion.li
                       key={item.id}
-                      style={{ listStyle: 'none' }}
                       variants={{
                         hidden: { opacity: 0, y: 24 },
                         visible: { opacity: 1, y: 0 },

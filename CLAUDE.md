@@ -51,7 +51,7 @@ src/
 - WhatsApp integration: +973 3633 4237
 
 ## SEO
-- **Domain**: yellowsports23.com
+- **Domain**: yellowsportsbh.com
 - **SEO Package**: `@dr.pogodin/react-helmet` via `HelmetProvider` in main.tsx
 - **Per-page SEO**: `src/components/SEO.tsx` — bilingual meta tags, OG, Twitter, canonical
 - **Structured Data**: JSON-LD in index.html (SportingGoodsStore, WebSite, BreadcrumbList)

@@ -12,7 +12,7 @@ interface SEOProps {
   type?: string
 }
 
-const BASE_URL = 'https://yellowsports23.com'
+const BASE_URL = 'https://yellowsportsbh.com'
 const OG_IMAGE = `${BASE_URL}/logo.jpeg`
 
 export default function SEO({

@@ -239,16 +239,16 @@ export default function Contact() {
     {
       key: 'whatsapp',
       label: t.contact.whatsapp,
-      value: '+973 3633 4237',
-      href: 'https://wa.me/97336334237',
+      value: '+973 3669 2966',
+      href: 'https://wa.me/97336692966',
       icon: <WhatsAppIcon />,
       accent: 'whatsapp',
     },
     {
       key: 'phone',
       label: t.contact.phone,
-      value: '+973 3633 4237',
-      href: 'tel:+97336334237',
+      value: '+973 3669 2966',
+      href: 'tel:+97336692966',
       icon: <PhoneIcon />,
     },
     {

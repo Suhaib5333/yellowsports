@@ -48,7 +48,7 @@ src/
 - Lenis for smooth scrolling (via `useSmoothScroll` hook in page components)
 - Respect `prefers-reduced-motion` in all animations
 - Mobile breakpoint at `lg` (1024px)
-- WhatsApp integration: +973 3633 4237
+- WhatsApp integration: +973 3669 2966
 
 ## SEO
 - **Domain**: yellowsportsbh.com

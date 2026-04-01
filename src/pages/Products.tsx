@@ -736,7 +736,7 @@ export default function ProductsPage() {
 
             {/* WhatsApp — transparent with green tint */}
             <motion.a
-              href="https://wa.me/97336334237"
+              href="https://wa.me/97336692966"
               target="_blank"
               rel="noopener noreferrer"
               className="cursor-pointer"

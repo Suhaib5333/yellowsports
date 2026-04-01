@@ -269,7 +269,7 @@ export default function Footer() {
 
           {/* WhatsApp */}
           <motion.a
-            href="https://wa.me/97336334237"
+            href="https://wa.me/97336692966"
             target="_blank"
             rel="noopener noreferrer"
             aria-label="WhatsApp"

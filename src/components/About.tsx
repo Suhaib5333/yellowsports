@@ -454,7 +454,7 @@ export default function About() {
                 {t.about.whyUsLabel}
               </span>
               <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: '10px' }}>
-                {[t.about.diff1, t.about.diff2, t.about.diff3, t.about.diff4].map((diff, i) => (
+                {[t.about.diff1, t.about.diff2, t.about.diff3].map((diff, i) => (
                   <motion.li
                     key={i}
                     style={{
@@ -544,6 +544,29 @@ export default function About() {
               </ul>
             </motion.div>
           </div>
+
+          {/* Trusted line — spans full width */}
+          <motion.p
+            style={{
+              fontFamily: isRTL ? 'var(--font-arabic)' : 'var(--font-sans)',
+              fontSize: 'clamp(0.85rem, 1vw, 0.95rem)',
+              lineHeight: isRTL ? 1.9 : 1.7,
+              color: 'rgba(255,224,32,0.45)',
+              maxWidth: '520px',
+              width: '100%',
+              marginBottom: '40px',
+              direction: isRTL ? 'rtl' : 'ltr',
+              fontWeight: 500,
+              borderTop: '1px solid rgba(255,224,32,0.08)',
+              paddingTop: '20px',
+            }}
+            initial={{ opacity: 0, y: 16 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.7, delay: 0.4, ease: [0.22, 1, 0.36, 1] }}
+            viewport={{ once: true }}
+          >
+            {t.about.trustedLine}
+          </motion.p>
 
           {/* Yellow ornament divider */}
           <motion.div

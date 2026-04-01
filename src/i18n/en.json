@@ -13,7 +13,18 @@
   "about": {
     "title": "The Sports Hub",
     "subtitle": "About Us",
-    "description": "Yellow Sports 23 is Bahrain's go-to destination for football jerseys, trophies, collectible pins, figurines, sports bags, footballs, flags, and everything a true sports fan needs. From Ronaldo and Messi jerseys to custom trophies and medals, we bring the passion of the game right to your doorstep.",
+    "description": "At Yellow Sports 23, sports isn't just products — it's a lifestyle. We offer a carefully curated selection of premium football jerseys, trophies, medals, and everything sports fans need to live the full experience.",
+    "description2": "We believe every player — whether professional or amateur — deserves the best to express their passion on and off the pitch.",
+    "whyUsLabel": "What Sets Us Apart",
+    "diff1": "Premium quality with attention to every detail",
+    "diff2": "Competitive prices that work for everyone",
+    "diff3": "Constantly updated with the latest designs",
+    "diff4": "Trusted by national teams, clubs, academies & ministries",
+    "servicesLabel": "Our Services",
+    "diff5": "Club & national team jerseys, boots & socks",
+    "diff6": "Custom trophies & medals for tournaments",
+    "diff7": "Full range of sports equipment & accessories",
+    "diff8": "Fast & reliable customer service",
     "cta": "Visit Our Store"
   },
   "productsCta": {
@@ -34,7 +45,7 @@
     "findUs": "Find Us",
     "getDirections": "Get Directions",
     "hours": "Opening Hours",
-    "hoursValue": "10AM – 10PM, Daily"
+    "hoursValue": "Sat–Thu: 10AM–1:30PM, 4PM–12AM | Fri: 4PM–12AM"
   },
   "footer": {
     "rights": "All rights reserved",

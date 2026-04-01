@@ -59,7 +59,7 @@ src/
 - **Noscript fallback**: Full store info in `<noscript>` block for crawlers
 - **Social**: Instagram @yellow_sports_23, TikTok @yellow_sports_23
 - **Location**: Building 221a, Road 77, Isa Town, Bahrain (26.1697, 50.5477)
-- **Hours**: 10AM–10PM daily
+- **Hours**: Sat–Thu 10AM–1:30PM & 4PM–12AM | Fri 4PM–12AM
 
 ## Frontend Design Tools Installed
 - UI UX Pro Max (uipro) - initialized

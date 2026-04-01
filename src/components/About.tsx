@@ -391,7 +391,7 @@ export default function About() {
               lineHeight: isRTL ? 2 : 1.85,
               color: 'rgba(245,245,240,0.6)',
               maxWidth: '480px',
-              marginBottom: '48px',
+              marginBottom: '32px',
               direction: isRTL ? 'rtl' : 'ltr',
             }}
             initial={{ opacity: 0, y: 24 }}
@@ -401,6 +401,149 @@ export default function About() {
           >
             {t.about.description}
           </motion.p>
+
+          {/* Second paragraph */}
+          <motion.p
+            style={{
+              fontFamily: isRTL ? 'var(--font-arabic)' : 'var(--font-sans)',
+              fontSize: 'clamp(0.9rem, 1.05vw, 1rem)',
+              lineHeight: isRTL ? 2 : 1.85,
+              color: 'rgba(245,245,240,0.45)',
+              maxWidth: '480px',
+              marginBottom: '36px',
+              direction: isRTL ? 'rtl' : 'ltr',
+              fontStyle: 'italic',
+            }}
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.7, delay: 0.25, ease: [0.22, 1, 0.36, 1] }}
+            viewport={{ once: true, margin: '0px' }}
+          >
+            {t.about.description2}
+          </motion.p>
+
+          {/* Two bullet groups side by side */}
+          <div
+            className="ys-about-bullets"
+            style={{
+              display: 'grid',
+              gridTemplateColumns: '1fr 1fr',
+              gap: '28px',
+              maxWidth: '520px',
+              width: '100%',
+              marginBottom: '40px',
+            }}
+          >
+            {/* Group 1 — What Sets Us Apart */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.7, delay: 0.25, ease: [0.22, 1, 0.36, 1] }}
+              viewport={{ once: true, margin: '0px' }}
+            >
+              <span style={{
+                fontFamily: isRTL ? 'var(--font-arabic)' : 'var(--font-sans)',
+                fontSize: '10px',
+                fontWeight: 700,
+                letterSpacing: isRTL ? '0.04em' : '0.2em',
+                textTransform: isRTL ? 'none' : 'uppercase',
+                color: '#FFE020',
+                display: 'block',
+                marginBottom: '14px',
+              }}>
+                {t.about.whyUsLabel}
+              </span>
+              <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                {[t.about.diff1, t.about.diff2, t.about.diff3, t.about.diff4].map((diff, i) => (
+                  <motion.li
+                    key={i}
+                    style={{
+                      display: 'flex',
+                      alignItems: 'flex-start',
+                      gap: '8px',
+                      direction: isRTL ? 'rtl' : 'ltr',
+                    }}
+                    initial={{ opacity: 0, x: isRTL ? 12 : -12 }}
+                    whileInView={{ opacity: 1, x: 0 }}
+                    transition={{ duration: 0.5, delay: 0.3 + i * 0.05, ease: [0.22, 1, 0.36, 1] }}
+                    viewport={{ once: true }}
+                  >
+                    <span style={{
+                      width: '4px', height: '4px', borderRadius: '50%',
+                      backgroundColor: '#FFE020',
+                      boxShadow: '0 0 6px rgba(255,224,32,0.4)',
+                      flexShrink: 0,
+                      marginTop: isRTL ? '9px' : '7px',
+                    }} />
+                    <span style={{
+                      fontFamily: isRTL ? 'var(--font-arabic)' : 'var(--font-sans)',
+                      fontSize: 'clamp(0.8rem, 0.95vw, 0.9rem)',
+                      lineHeight: isRTL ? 1.7 : 1.55,
+                      color: 'rgba(245,245,240,0.4)',
+                      fontWeight: 500,
+                    }}>
+                      {diff}
+                    </span>
+                  </motion.li>
+                ))}
+              </ul>
+            </motion.div>
+
+            {/* Group 2 — Our Services */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.7, delay: 0.35, ease: [0.22, 1, 0.36, 1] }}
+              viewport={{ once: true, margin: '0px' }}
+            >
+              <span style={{
+                fontFamily: isRTL ? 'var(--font-arabic)' : 'var(--font-sans)',
+                fontSize: '10px',
+                fontWeight: 700,
+                letterSpacing: isRTL ? '0.04em' : '0.2em',
+                textTransform: isRTL ? 'none' : 'uppercase',
+                color: '#FFE020',
+                display: 'block',
+                marginBottom: '14px',
+              }}>
+                {t.about.servicesLabel}
+              </span>
+              <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                {[t.about.diff5, t.about.diff6, t.about.diff7, t.about.diff8].map((diff, i) => (
+                  <motion.li
+                    key={i}
+                    style={{
+                      display: 'flex',
+                      alignItems: 'flex-start',
+                      gap: '8px',
+                      direction: isRTL ? 'rtl' : 'ltr',
+                    }}
+                    initial={{ opacity: 0, x: isRTL ? 12 : -12 }}
+                    whileInView={{ opacity: 1, x: 0 }}
+                    transition={{ duration: 0.5, delay: 0.4 + i * 0.05, ease: [0.22, 1, 0.36, 1] }}
+                    viewport={{ once: true }}
+                  >
+                    <span style={{
+                      width: '4px', height: '4px', borderRadius: '50%',
+                      backgroundColor: '#FFE020',
+                      boxShadow: '0 0 6px rgba(255,224,32,0.4)',
+                      flexShrink: 0,
+                      marginTop: isRTL ? '9px' : '7px',
+                    }} />
+                    <span style={{
+                      fontFamily: isRTL ? 'var(--font-arabic)' : 'var(--font-sans)',
+                      fontSize: 'clamp(0.8rem, 0.95vw, 0.9rem)',
+                      lineHeight: isRTL ? 1.7 : 1.55,
+                      color: 'rgba(245,245,240,0.4)',
+                      fontWeight: 500,
+                    }}>
+                      {diff}
+                    </span>
+                  </motion.li>
+                ))}
+              </ul>
+            </motion.div>
+          </div>
 
           {/* Yellow ornament divider */}
           <motion.div
@@ -484,6 +627,13 @@ export default function About() {
           .ys-about-accent-desktop { display: none !important; }
           .ys-about-accent-mobile  { display: block !important; }
           .ys-about-accent-line { display: none !important; }
+        }
+
+        @media (max-width: 480px) {
+          .ys-about-bullets {
+            grid-template-columns: 1fr !important;
+            gap: 24px !important;
+          }
         }
       `}</style>
     </section>

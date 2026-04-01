@@ -12,7 +12,7 @@ export default function Home() {
       <SEO
         title="Football Jerseys, Trophies & Sports Collectibles in Bahrain"
         titleAr="قمصان كرة قدم، كؤوس ومقتنيات رياضية في البحرين"
-        description="Yellow Sports 23 is Bahrain's #1 sports store in Isa Town. Shop football jerseys (Ronaldo, Messi), custom trophies, medals, collectible pins, figurines, sports bags & more. Open daily 10AM–10PM."
+        description="Yellow Sports 23 is Bahrain's #1 sports store in Isa Town. Shop football jerseys (Ronaldo, Messi), custom trophies, medals, collectible pins, figurines, sports bags & more. Sat–Thu 10AM–1:30PM & 4PM–12AM, Fri 4PM–12AM."
         descriptionAr="يلو سبورتس ٢٣ — الوجهة الأولى في البحرين لقمصان كرة القدم، الكؤوس المخصصة، الميداليات، الدبابيس، المجسمات، حقائب الرياضة والمزيد. مفتوح يومياً من ١٠ صباحاً حتى ١٠ مساءً."
         path="/"
         keywords="Yellow Sports 23, sports store Bahrain, football jerseys Bahrain, Ronaldo jersey, Messi jersey, custom trophies Bahrain, sports collectibles, medals, pins, figurines, sports bags, Isa Town, buy jerseys Bahrain, football store"

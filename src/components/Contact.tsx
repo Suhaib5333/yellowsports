@@ -106,8 +106,8 @@ function ContactCard({
       style={{
         display: 'flex',
         alignItems: 'center',
-        gap: '16px',
-        padding: 'clamp(14px, 2.5vw, 18px) clamp(14px, 3vw, 20px)',
+        gap: 'clamp(10px, 2vw, 16px)',
+        padding: 'clamp(12px, 2.5vw, 18px) clamp(12px, 3vw, 20px)',
         textDecoration: 'none',
         position: 'relative',
         overflow: 'hidden',
@@ -159,7 +159,7 @@ function ContactCard({
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
-        width: '44px', height: '44px',
+        width: 'clamp(38px, 8vw, 44px)', height: 'clamp(38px, 8vw, 44px)',
         flexShrink: 0,
         borderRadius: '50%',
         ...(item.accent === 'insta'
@@ -199,13 +199,13 @@ function ContactCard({
         </p>
         <p style={{
           fontFamily: isRTL ? 'var(--font-arabic)' : 'var(--font-sans)',
-          fontSize: '14px',
+          fontSize: 'clamp(12px, 2.5vw, 14px)',
           fontWeight: 600,
           color: c ? c.text : '#F5F5F0',
           overflow: 'hidden',
           textOverflow: 'ellipsis',
-          whiteSpace: 'nowrap',
-          direction: 'ltr',
+          whiteSpace: item.key === 'hours' ? 'normal' : 'nowrap',
+          ...((['phone', 'whatsapp'].includes(item.key)) ? { direction: 'ltr' as const, textAlign: isRTL ? 'right' as const : undefined } : {}),
         }}>
           {item.value}
         </p>
@@ -321,7 +321,7 @@ export default function Contact() {
         position: 'relative', zIndex: 1,
         maxWidth: '1280px',
         margin: '0 auto',
-        padding: '96px 64px 112px',
+        padding: 'clamp(64px, 10vw, 96px) clamp(16px, 5vw, 64px) clamp(64px, 10vw, 112px)',
       }}>
 
         {/* ═══ SECTION HEADER ═══ */}
@@ -330,7 +330,7 @@ export default function Contact() {
           flexDirection: 'column',
           alignItems: 'center',
           textAlign: 'center',
-          marginBottom: '72px',
+          marginBottom: 'clamp(40px, 8vw, 72px)',
         }}>
           {/* Label + ornament */}
           <motion.div
@@ -402,11 +402,11 @@ export default function Contact() {
           display: 'grid',
           gridTemplateColumns: '1fr 1fr',
           gap: '64px',
-          alignItems: 'center',
+          alignItems: 'start',
         }}>
 
           {/* ── MAP COLUMN ── */}
-          <div style={{ position: 'relative', order: isRTL ? 2 : 0 }}>
+          <div className="ys-contact-map-col" style={{ position: 'relative', order: isRTL ? 2 : 0 }}>
             {/* Map container with accent frame */}
             <motion.div
               style={{
@@ -425,6 +425,7 @@ export default function Contact() {
                 src={MAP_EMBED_URL}
                 width="100%"
                 height="100%"
+                className="ys-contact-map-iframe"
                 style={{
                   border: 0,
                   display: 'block',
@@ -549,9 +550,10 @@ export default function Contact() {
           </div>
 
           {/* ── CONTACT INFO COLUMN ── */}
-          <div style={{ order: isRTL ? 1 : 0 }}>
+          <div className="ys-contact-info-col" style={{ order: isRTL ? 1 : 0 }}>
             {/* Column sub-header */}
             <motion.div
+              className="ys-contact-subheader"
               style={{ marginBottom: '28px' }}
               initial={{ opacity: 0, y: 16 }}
               whileInView={{ opacity: 1, y: 0 }}
@@ -571,7 +573,7 @@ export default function Contact() {
             </motion.div>
 
             {/* Contact cards stack */}
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 'clamp(8px, 1.5vw, 10px)' }}>
               {contactItems.map((item, index) => (
                 <ContactCard key={item.key} item={item} index={index} isRTL={isRTL} />
               ))}
@@ -579,6 +581,7 @@ export default function Contact() {
 
             {/* Bottom ornament */}
             <motion.div
+              className="ys-contact-ornament"
               style={{ display: 'flex', justifyContent: isRTL ? 'flex-end' : 'flex-start', marginTop: '32px' }}
               initial={{ opacity: 0 }}
               whileInView={{ opacity: 1 }}
@@ -596,23 +599,36 @@ export default function Contact() {
         @media (max-width: 1024px) {
           .ys-contact-grid {
             grid-template-columns: 1fr !important;
-            gap: 48px !important;
+            gap: 40px !important;
+            align-items: stretch !important;
           }
           .ys-contact-accent-line {
             display: none !important;
           }
+          .ys-contact-ornament {
+            justify-content: center !important;
+          }
+          .ys-contact-subheader {
+            text-align: center !important;
+          }
+          .ys-contact-map-col {
+            order: 0 !important;
+          }
+          .ys-contact-info-col {
+            order: 1 !important;
+          }
         }
         @media (max-width: 768px) {
-          .ys-contact-content {
-            padding: 64px 24px 80px !important;
-          }
           .ys-contact-grid {
-            gap: 36px !important;
+            gap: 32px !important;
+          }
+          .ys-contact-map-iframe {
+            aspect-ratio: 16 / 10 !important;
           }
         }
         @media (max-width: 480px) {
-          .ys-contact-content {
-            padding: 48px 16px 64px !important;
+          .ys-contact-map-iframe {
+            aspect-ratio: 16 / 11 !important;
           }
         }
       `}</style>

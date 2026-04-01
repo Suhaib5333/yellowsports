@@ -652,7 +652,7 @@ export default function About() {
           .ys-about-accent-line { display: none !important; }
         }
 
-        @media (max-width: 480px) {
+        @media (max-width: 640px) {
           .ys-about-bullets {
             grid-template-columns: 1fr !important;
             gap: 24px !important;
